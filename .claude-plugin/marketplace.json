@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "finolabs",
+  "owner": {
+    "name": "FINOLABS",
+    "url": "https://github.com/finolabs"
+  },
+  "description": "FINOLABS plugins for AI coding agents.",
+  "plugins": [
+    {
+      "name": "finolabs-vibecode",
+      "source": {
+        "source": "github",
+        "repo": "fioenix/finolabs-vibecode"
+      },
+      "description": "One engineering practice for AI coding agents: coding-work routing, agent delegation, versioning, commit messages, review gates, security review, verification and open source readiness.",
+      "homepage": "https://github.com/fioenix/finolabs-vibecode",
+      "repository": "https://github.com/fioenix/finolabs-vibecode",
+      "license": "MIT",
+      "category": "development",
+      "keywords": [
+        "coding-router",
+        "delegation",
+        "code-review",
+        "security-review",
+        "versioning",
+        "verification",
+        "agent-skills"
+      ]
+    },
+    {
+      "name": "agybird",
+      "source": {
+        "source": "github",
+        "repo": "fioenix/agybird"
+      },
+      "description": "Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription.",
+      "homepage": "https://github.com/fioenix/agybird",
+      "repository": "https://github.com/fioenix/agybird",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "antigravity",
+        "agy",
+        "gemini",
+        "delegation",
+        "agent-skills"
+      ]
+    },
+    {
+      "name": "vietnamizer",
+      "source": {
+        "source": "github",
+        "repo": "fioenix/vietnamizer"
+      },
+      "description": "Edit Vietnamese drafts, articles, READMEs and translations to read naturally while keeping meaning, facts, terms, code and the writer's voice.",
+      "homepage": "https://github.com/fioenix/vietnamizer",
+      "repository": "https://github.com/fioenix/vietnamizer",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "vietnamese",
+        "writing",
+        "editing",
+        "translation",
+        "agent-skills"
+      ]
+    },
+    {
+      "name": "markmap-skills",
+      "source": {
+        "source": "github",
+        "repo": "fioenix/markmap-skills"
+      },
+      "description": "Markmap mindmaps for AI agents with strict cognitive structuring, as clean .mindmap.md files and standalone HTML.",
+      "homepage": "https://github.com/fioenix/markmap-skills",
+      "repository": "https://github.com/fioenix/markmap-skills",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "markmap",
+        "mindmap",
+        "visualization",
+        "diagram",
+        "agent-skills"
+      ]
+    }
+  ]
+}
