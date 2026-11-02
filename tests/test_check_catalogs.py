@@ -44,6 +44,13 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("source owner evil is not in OWNERS", result.stdout)
 
+    def test_path_traversal_outside_owners_fails(self):
+        self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="fioenix/../evil/x"))
+        self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/fioenix/../evil/x.git"))
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("is not a plain owner/repository", result.stdout)
+
     def test_catalogs_out_of_step_fail(self):
         self.edit(self.codex, lambda d: d["plugins"].pop())
         result = self.check()

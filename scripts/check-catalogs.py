@@ -48,6 +48,8 @@ for a, b in zip(claude["plugins"], codex["plugins"]):
     ra, rb = repo_of_claude(a), repo_of_codex(b)
     if not ra or ra != rb:
         problems.append(f"{a['name']}: sources differ or are not GitHub repositories ({ra}, {rb})")
+    elif not re.fullmatch(r"[A-Za-z0-9-]+/[A-Za-z0-9_.-]+", ra) or ra.split("/")[1] in (".", ".."):
+        problems.append(f"{a['name']}: source {ra} is not a plain owner/repository")
     elif ra.split("/")[0] not in OWNERS:
         problems.append(f"{a['name']}: source owner {ra.split('/')[0]} is not in OWNERS")
 
