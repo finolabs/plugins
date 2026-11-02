@@ -1,13 +1,13 @@
 # FINOLABS plugins
 
-One catalog for the FINOLABS plugins, so each agent shows them together under **Finolabs**. Each plugin lives in its own repository under [github.com/fioenix](https://github.com/fioenix), with its own releases, issues and license; this repository only lists them. `finolabs/plugins` is the only official FINOLABS catalog. Installs track each plugin's default branch, which its repository protects with required pull requests and checks; to pin a release on Codex, add the plugin's own repository at its tag (`codex plugin marketplace add fioenix/<plugin>@v<version>`); Claude Code has no pinned marketplace install yet.
+One catalog for the FINOLABS plugins, so each agent shows them together under **Finolabs**. Each plugin lives in its own repository under [github.com/finolabs](https://github.com/finolabs), with its own releases, issues and license; this repository only lists them. `finolabs/plugins` is the only official FINOLABS catalog. Installs track each plugin's default branch, which its repository protects with required pull requests and checks; to pin a release on Codex, add the plugin's own repository at its tag (`codex plugin marketplace add finolabs/<plugin>@v<version>`); Claude Code has no pinned marketplace install yet.
 
 | Plugin | What it does |
 | --- | --- |
-| [finolabs-vibecode](https://github.com/fioenix/finolabs-vibecode) | One engineering practice for AI coding agents: routing coding work, delegating across agents, review and security gates, verification, versioning and open source readiness. |
-| [agybird](https://github.com/fioenix/agybird) | Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription. |
-| [vietnamizer](https://github.com/fioenix/vietnamizer) | Edit Vietnamese drafts, articles, READMEs and translations to read naturally, keeping meaning, facts, terms, code and the writer's voice. |
-| [markmap-skills](https://github.com/fioenix/markmap-skills) | Markmap mindmaps for AI agents with strict cognitive structuring, as `.mindmap.md` files and standalone HTML. |
+| [finolabs-vibecode](https://github.com/finolabs/finolabs-vibecode) | One engineering practice for AI coding agents: routing coding work, delegating across agents, review and security gates, verification, versioning and open source readiness. |
+| [agybird](https://github.com/finolabs/agybird) | Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription. |
+| [vietnamizer](https://github.com/finolabs/vietnamizer) | Edit Vietnamese drafts, articles, READMEs and translations to read naturally, keeping meaning, facts, terms, code and the writer's voice. |
+| [markmap-skills](https://github.com/finolabs/markmap-skills) | Markmap mindmaps for AI agents with strict cognitive structuring, as `.mindmap.md` files and standalone HTML. |
 
 ## Install
 
@@ -29,7 +29,7 @@ codex plugin add finolabs-vibecode@finolabs
 
 Refresh the catalog with `codex plugin marketplace upgrade finolabs`.
 
-**Moving from the older `Finolabs` catalog** (registered from `fioenix/agybird`, selectors such as `agybird@Finolabs`), only when `codex plugin marketplace list` shows `Finolabs`: remove it before adding this one. On macOS both names share one plugin cache folder, so the same plugin installed from both catalogs overwrites itself.
+**Moving from the older `Finolabs` catalog** (registered from `fioenix/agybird`, now `finolabs/agybird`, selectors such as `agybird@Finolabs`), only when `codex plugin marketplace list` shows `Finolabs`: remove it before adding this one. On macOS both names share one plugin cache folder, so the same plugin installed from both catalogs overwrites itself.
 
 ```bash
 codex plugin remove agybird@Finolabs          # and each other @Finolabs plugin you installed
@@ -43,12 +43,12 @@ codex plugin add agybird@finolabs             # reinstall what you removed
 Antigravity 1.4 resolves `plugin@marketplace` only for its official marketplace (`antigravity-plugins-official`); `agy plugin install agybird@finolabs` answers "unknown marketplace". Install each plugin from its repository:
 
 ```bash
-agy plugin install https://github.com/fioenix/finolabs-vibecode
+agy plugin install https://github.com/finolabs/finolabs-vibecode
 ```
 
 ### Other agents
 
-Plugins that ship agent skills also install through [skills.sh](https://skills.sh), for example `npx skills add fioenix/finolabs-vibecode`.
+Plugins that ship agent skills also install through [skills.sh](https://skills.sh), for example `npx skills add finolabs/finolabs-vibecode`.
 
 ## For AI agents
 

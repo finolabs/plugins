@@ -15,7 +15,7 @@ import sys
 import urllib.request
 from pathlib import Path
 
-OWNERS = {"fioenix", "finolabs"}  # GitHub owners whose repositories may be listed
+OWNERS = {"finolabs"}  # GitHub owners whose repositories may be listed
 
 args = [a for a in sys.argv[1:] if not a.startswith("--")]
 root = Path(args[0]) if args else Path(__file__).resolve().parent.parent
