@@ -45,8 +45,8 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertIn("source owner evil is not in OWNERS", result.stdout)
 
     def test_path_traversal_outside_owners_fails(self):
-        self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="fioenix/../evil/x"))
-        self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/fioenix/../evil/x.git"))
+        self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="finolabs/../evil/x"))
+        self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/finolabs/../evil/x.git"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("is not a plain owner/repository", result.stdout)
@@ -58,13 +58,13 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertIn("plugin lists differ", result.stdout)
 
     def test_sources_that_differ_fail(self):
-        self.edit(self.codex, lambda d: d["plugins"][1]["source"].update(url="https://github.com/fioenix/other.git"))
+        self.edit(self.codex, lambda d: d["plugins"][1]["source"].update(url="https://github.com/finolabs/other.git"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("sources differ", result.stdout)
 
     def test_string_source_reports_instead_of_crashing(self):
-        self.edit(self.codex, lambda d: d["plugins"][0].update(source="https://github.com/fioenix/agybird.git"))
+        self.edit(self.codex, lambda d: d["plugins"][0].update(source="https://github.com/finolabs/agybird.git"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("sources differ", result.stdout)
@@ -72,7 +72,7 @@ class CheckCatalogsTest(unittest.TestCase):
 
     def test_readme_table_out_of_step_fails(self):
         readme = self.root / "README.md"
-        readme.write_text(readme.read_text().replace("| [markmap-skills](https://github.com/fioenix/markmap-skills)", "| [markmap](https://github.com/fioenix/markmap-skills)"))
+        readme.write_text(readme.read_text().replace("| [markmap-skills](https://github.com/finolabs/markmap-skills)", "| [markmap](https://github.com/finolabs/markmap-skills)"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("README table lists", result.stdout)

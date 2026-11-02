@@ -8,7 +8,7 @@
       "name": "finolabs-vibecode",
       "source": {
         "source": "url",
-        "url": "https://github.com/fioenix/finolabs-vibecode.git"
+        "url": "https://github.com/finolabs/finolabs-vibecode.git"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -20,7 +20,7 @@
       "name": "agybird",
       "source": {
         "source": "url",
-        "url": "https://github.com/fioenix/agybird.git"
+        "url": "https://github.com/finolabs/agybird.git"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -32,7 +32,7 @@
       "name": "vietnamizer",
       "source": {
         "source": "url",
-        "url": "https://github.com/fioenix/vietnamizer.git"
+        "url": "https://github.com/finolabs/vietnamizer.git"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -44,7 +44,7 @@
       "name": "markmap-skills",
       "source": {
         "source": "url",
-        "url": "https://github.com/fioenix/markmap-skills.git"
+        "url": "https://github.com/finolabs/markmap-skills.git"
       },
       "policy": {
         "installation": "AVAILABLE",

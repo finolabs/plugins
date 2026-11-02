@@ -11,11 +11,11 @@
       "name": "finolabs-vibecode",
       "source": {
         "source": "github",
-        "repo": "fioenix/finolabs-vibecode"
+        "repo": "finolabs/finolabs-vibecode"
       },
       "description": "One engineering practice for AI coding agents: coding-work routing, agent delegation, versioning, commit messages, review gates, security review, verification and open source readiness.",
-      "homepage": "https://github.com/fioenix/finolabs-vibecode",
-      "repository": "https://github.com/fioenix/finolabs-vibecode",
+      "homepage": "https://github.com/finolabs/finolabs-vibecode",
+      "repository": "https://github.com/finolabs/finolabs-vibecode",
       "license": "MIT",
       "category": "development",
       "keywords": [
@@ -32,11 +32,11 @@
       "name": "agybird",
       "source": {
         "source": "github",
-        "repo": "fioenix/agybird"
+        "repo": "finolabs/agybird"
       },
       "description": "Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription.",
-      "homepage": "https://github.com/fioenix/agybird",
-      "repository": "https://github.com/fioenix/agybird",
+      "homepage": "https://github.com/finolabs/agybird",
+      "repository": "https://github.com/finolabs/agybird",
       "license": "MIT",
       "category": "productivity",
       "keywords": [
@@ -51,11 +51,11 @@
       "name": "vietnamizer",
       "source": {
         "source": "github",
-        "repo": "fioenix/vietnamizer"
+        "repo": "finolabs/vietnamizer"
       },
       "description": "Edit Vietnamese drafts, articles, READMEs and translations to read naturally while keeping meaning, facts, terms, code and the writer's voice.",
-      "homepage": "https://github.com/fioenix/vietnamizer",
-      "repository": "https://github.com/fioenix/vietnamizer",
+      "homepage": "https://github.com/finolabs/vietnamizer",
+      "repository": "https://github.com/finolabs/vietnamizer",
       "license": "MIT",
       "category": "productivity",
       "keywords": [
@@ -70,11 +70,11 @@
       "name": "markmap-skills",
       "source": {
         "source": "github",
-        "repo": "fioenix/markmap-skills"
+        "repo": "finolabs/markmap-skills"
       },
       "description": "Markmap mindmaps for AI agents with strict cognitive structuring, as clean .mindmap.md files and standalone HTML.",
-      "homepage": "https://github.com/fioenix/markmap-skills",
-      "repository": "https://github.com/fioenix/markmap-skills",
+      "homepage": "https://github.com/finolabs/markmap-skills",
+      "repository": "https://github.com/finolabs/markmap-skills",
       "license": "MIT",
       "category": "productivity",
       "keywords": [
