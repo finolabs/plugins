@@ -78,6 +78,8 @@ if readme.exists():
 if "--remote" in sys.argv:
     # CATALOG_RAW_BASE lets the tests read manifests from a directory laid out as <base>/<owner>/<repo>/HEAD/<path>.
     base = os.environ.get("CATALOG_RAW_BASE", "https://raw.githubusercontent.com")
+    if not base.startswith(("https://", "file://")):
+        sys.exit("CATALOG_RAW_BASE must start with https:// or file://")
     for entry in claude["plugins"]:
         repo = repo_of_claude(entry)
         for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json", ".antigravity-plugin/plugin.json"):
@@ -88,8 +90,11 @@ if "--remote" in sys.argv:
             except Exception as error:  # noqa: BLE001 - report any fetch or parse failure
                 problems.append(f"{entry['name']}: cannot read {manifest} ({error.__class__.__name__})")
                 continue
+            if not isinstance(data, dict):
+                problems.append(f"{entry['name']}: {manifest} is not a JSON object")
+                continue
             if data.get("name") != entry["name"]:
-                problems.append(f"{entry['name']}: {manifest} names the plugin {data.get('name')}")
+                problems.append(f"{entry['name']}: {manifest} names the plugin {data.get('name')!r}")
             for field in ("description", "keywords"):
                 if data.get(field) != entry.get(field):
                     problems.append(f"{entry['name']}: {manifest} {field} differs from the catalog entry")

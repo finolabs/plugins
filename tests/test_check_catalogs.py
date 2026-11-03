@@ -83,6 +83,19 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("description is 10 characters, expected 120-160", result.stdout)
 
+    def test_description_length_limits_are_inclusive(self):
+        for length, accepted in [(119, False), (120, True), (160, True), (161, False)]:
+            with self.subTest(length=length):
+                self.edit(self.claude, lambda d: d["plugins"][0].update(description="x" * length))
+                stdout = self.check().stdout
+                self.assertEqual("expected 120-160" not in stdout, accepted, stdout)
+
+    def test_entry_without_keywords_fails(self):
+        self.edit(self.claude, lambda d: d["plugins"][0].pop("keywords"))
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("finolabs-vibecode: no keywords", result.stdout)
+
     def test_readme_description_out_of_step_fails(self):
         self.edit(self.claude, lambda d: d["plugins"][1].update(description=d["plugins"][1]["description"] + " "))
         result = self.check()
@@ -134,6 +147,29 @@ class RemoteManifestsTest(unittest.TestCase):
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("vietnamizer: .codex-plugin/plugin.json keywords differs from the catalog entry", result.stdout)
+
+    def test_manifest_naming_another_plugin_fails(self):
+        path = self.base / "finolabs/agybird/HEAD/.claude-plugin/plugin.json"
+        data = json.loads(path.read_text())
+        data["name"] = "agybird-fork"
+        path.write_text(json.dumps(data))
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("agybird: .claude-plugin/plugin.json names the plugin 'agybird-fork'", result.stdout)
+
+    def test_manifest_that_is_not_an_object_fails_without_crashing(self):
+        (self.base / "finolabs/agybird/HEAD/.codex-plugin/plugin.json").write_text("[1]")
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("agybird: .codex-plugin/plugin.json is not a JSON object", result.stdout)
+        self.assertNotIn("Traceback", result.stderr)
+
+    def test_unsupported_base_scheme_is_refused(self):
+        env = {"CATALOG_RAW_BASE": "ftp://example.invalid", "PATH": "/usr/bin:/bin"}
+        result = subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), "--remote"],
+                                capture_output=True, text=True, env=env)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("must start with https:// or file://", result.stderr)
 
     def test_missing_antigravity_manifest_fails(self):
         (self.base / "finolabs/markmap-skills/HEAD/.antigravity-plugin/plugin.json").unlink()
