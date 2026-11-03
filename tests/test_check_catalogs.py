@@ -42,7 +42,32 @@ class CheckCatalogsTest(unittest.TestCase):
         self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/evil/finolabs-vibecode.git"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
-        self.assertIn("source owner evil is not in OWNERS", result.stdout)
+        self.assertIn("source owner 'evil' is not in OWNERS", result.stdout)
+
+    def test_remote_skips_a_source_that_already_failed(self):
+        self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="evil/finolabs-vibecode"))
+        self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/evil/finolabs-vibecode.git"))
+        empty = tempfile.TemporaryDirectory()
+        self.addCleanup(empty.cleanup)
+        env = {"CATALOG_RAW_BASE": Path(empty.name).as_uri(), "PATH": "/usr/bin:/bin"}
+        result = subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), str(self.root), "--remote"],
+                                capture_output=True, text=True, env=env)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("source owner 'evil' is not in OWNERS", result.stdout)
+        self.assertNotIn("'finolabs-vibecode': cannot read", result.stdout)
+        self.assertIn("'agybird': cannot read", result.stdout)
+
+    def test_remote_does_not_fetch_an_entry_past_the_shorter_catalog(self):
+        self.edit(self.claude, lambda d: d["plugins"][-1]["source"].update(repo="evil/x"))
+        self.edit(self.codex, lambda d: d["plugins"].pop())
+        empty = tempfile.TemporaryDirectory()
+        self.addCleanup(empty.cleanup)
+        env = {"CATALOG_RAW_BASE": Path(empty.name).as_uri(), "PATH": "/usr/bin:/bin"}
+        result = subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), str(self.root), "--remote"],
+                                capture_output=True, text=True, env=env)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("plugin lists differ", result.stdout)
+        self.assertNotIn("'markmap-skills': cannot read", result.stdout)
 
     def test_path_traversal_outside_owners_fails(self):
         self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="finolabs/../evil/x"))
@@ -94,7 +119,7 @@ class CheckCatalogsTest(unittest.TestCase):
         self.edit(self.claude, lambda d: d["plugins"][0].pop("keywords"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
-        self.assertIn("finolabs-vibecode: no keywords", result.stdout)
+        self.assertIn("'finolabs-vibecode': no keywords", result.stdout)
 
     def test_readme_description_out_of_step_fails(self):
         self.edit(self.claude, lambda d: d["plugins"][1].update(description=d["plugins"][1]["description"] + " "))
@@ -137,7 +162,7 @@ class RemoteManifestsTest(unittest.TestCase):
         path.write_text(json.dumps(data))
         result = self.check()
         self.assertEqual(result.returncode, 1)
-        self.assertIn("agybird: .antigravity-plugin/plugin.json description differs from the catalog entry", result.stdout)
+        self.assertIn("'agybird': .antigravity-plugin/plugin.json description differs from the catalog entry", result.stdout)
 
     def test_manifest_keyword_drift_fails(self):
         path = self.base / "finolabs/vietnamizer/HEAD/.codex-plugin/plugin.json"
@@ -146,7 +171,7 @@ class RemoteManifestsTest(unittest.TestCase):
         path.write_text(json.dumps(data))
         result = self.check()
         self.assertEqual(result.returncode, 1)
-        self.assertIn("vietnamizer: .codex-plugin/plugin.json keywords differs from the catalog entry", result.stdout)
+        self.assertIn("'vietnamizer': .codex-plugin/plugin.json keywords differs from the catalog entry", result.stdout)
 
     def test_manifest_naming_another_plugin_fails(self):
         path = self.base / "finolabs/agybird/HEAD/.claude-plugin/plugin.json"
@@ -155,13 +180,13 @@ class RemoteManifestsTest(unittest.TestCase):
         path.write_text(json.dumps(data))
         result = self.check()
         self.assertEqual(result.returncode, 1)
-        self.assertIn("agybird: .claude-plugin/plugin.json names the plugin 'agybird-fork'", result.stdout)
+        self.assertIn("'agybird': .claude-plugin/plugin.json names the plugin 'agybird-fork'", result.stdout)
 
     def test_manifest_that_is_not_an_object_fails_without_crashing(self):
         (self.base / "finolabs/agybird/HEAD/.codex-plugin/plugin.json").write_text("[1]")
         result = self.check()
         self.assertEqual(result.returncode, 1)
-        self.assertIn("agybird: .codex-plugin/plugin.json is not a JSON object", result.stdout)
+        self.assertIn("'agybird': .codex-plugin/plugin.json is not a JSON object", result.stdout)
         self.assertNotIn("Traceback", result.stderr)
 
     def test_unsupported_base_scheme_is_refused(self):
@@ -175,7 +200,7 @@ class RemoteManifestsTest(unittest.TestCase):
         (self.base / "finolabs/markmap-skills/HEAD/.antigravity-plugin/plugin.json").unlink()
         result = self.check()
         self.assertEqual(result.returncode, 1)
-        self.assertIn("markmap-skills: cannot read .antigravity-plugin/plugin.json", result.stdout)
+        self.assertIn("'markmap-skills': cannot read .antigravity-plugin/plugin.json", result.stdout)
 
 
 if __name__ == "__main__":

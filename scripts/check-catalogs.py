@@ -41,27 +41,34 @@ def repo_of_codex(entry):
 claude_names = [p["name"] for p in claude["plugins"]]
 codex_names = [p["name"] for p in codex["plugins"]]
 if claude["name"] != codex["name"]:
-    problems.append(f"catalog names differ: {claude['name']} and {codex['name']}")
+    problems.append(f"catalog names differ: {claude['name']!r} and {codex['name']!r}")
 if claude_names != codex_names:
     problems.append(f"plugin lists differ: {claude_names} and {codex_names}")
 if len(set(claude_names)) != len(claude_names):
     problems.append("a plugin is listed twice")
+def source_problem(repo):
+    """Why a catalog source may not be fetched, or None when it is a plain owner/repository in OWNERS."""
+    if not repo or not re.fullmatch(r"[A-Za-z0-9-]+/[A-Za-z0-9_.-]+", repo) or repo.split("/")[1] in (".", ".."):
+        return f"source {repo!r} is not a plain owner/repository"
+    if repo.split("/")[0] not in OWNERS:
+        return f"source owner {repo.split('/')[0]!r} is not in OWNERS"
+    return None
+
+
 for a, b in zip(claude["plugins"], codex["plugins"]):
     ra, rb = repo_of_claude(a), repo_of_codex(b)
     if not ra or ra != rb:
-        problems.append(f"{a['name']}: sources differ or are not GitHub repositories ({ra}, {rb})")
-    elif not re.fullmatch(r"[A-Za-z0-9-]+/[A-Za-z0-9_.-]+", ra) or ra.split("/")[1] in (".", ".."):
-        problems.append(f"{a['name']}: source {ra} is not a plain owner/repository")
-    elif ra.split("/")[0] not in OWNERS:
-        problems.append(f"{a['name']}: source owner {ra.split('/')[0]} is not in OWNERS")
+        problems.append(f"{a['name']!r}: sources differ or are not GitHub repositories ({ra!r}, {rb!r})")
+    elif source_problem(ra):
+        problems.append(f"{a['name']!r}: {source_problem(ra)}")
 
 for entry in claude["plugins"]:
     # Antigravity suggests 120-160 characters; one description serves every host and the README.
     description = entry.get("description", "")
     if not 120 <= len(description) <= 160:
-        problems.append(f"{entry['name']}: description is {len(description)} characters, expected 120-160")
+        problems.append(f"{entry['name']!r}: description is {len(description)} characters, expected 120-160")
     if not entry.get("keywords"):
-        problems.append(f"{entry['name']}: no keywords")
+        problems.append(f"{entry['name']!r}: no keywords")
 
 readme = root / "README.md"
 if readme.exists():
@@ -71,9 +78,9 @@ if readme.exists():
         problems.append(f"README table lists {[name for name, _, _ in rows]}, catalogs list {claude_names}")
     for (name, repo, description), entry in zip(rows, claude["plugins"]):
         if repo != repo_of_claude(entry):
-            problems.append(f"README table links {name} to {repo}, catalog to {repo_of_claude(entry)}")
+            problems.append(f"README table links {name!r} to {repo!r}, catalog to {repo_of_claude(entry)!r}")
         if description != entry.get("description"):
-            problems.append(f"{name}: README table description differs from the catalog entry")
+            problems.append(f"{name!r}: README table description differs from the catalog entry")
 
 if "--remote" in sys.argv:
     # CATALOG_RAW_BASE lets the tests read manifests from a directory laid out as <base>/<owner>/<repo>/HEAD/<path>.
@@ -82,22 +89,25 @@ if "--remote" in sys.argv:
         sys.exit("CATALOG_RAW_BASE must start with https:// or file://")
     for entry in claude["plugins"]:
         repo = repo_of_claude(entry)
+        # Every Claude entry is guarded here, including ones past the shorter catalog that the zip above never saw.
+        if source_problem(repo):
+            continue
         for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json", ".antigravity-plugin/plugin.json"):
             url = f"{base}/{repo}/HEAD/{manifest}"
             try:
                 with urllib.request.urlopen(url, timeout=20) as response:
                     data = json.load(response)
             except Exception as error:  # noqa: BLE001 - report any fetch or parse failure
-                problems.append(f"{entry['name']}: cannot read {manifest} ({error.__class__.__name__})")
+                problems.append(f"{entry['name']!r}: cannot read {manifest} ({error.__class__.__name__})")
                 continue
             if not isinstance(data, dict):
-                problems.append(f"{entry['name']}: {manifest} is not a JSON object")
+                problems.append(f"{entry['name']!r}: {manifest} is not a JSON object")
                 continue
             if data.get("name") != entry["name"]:
-                problems.append(f"{entry['name']}: {manifest} names the plugin {data.get('name')!r}")
+                problems.append(f"{entry['name']!r}: {manifest} names the plugin {data.get('name')!r}")
             for field in ("description", "keywords"):
                 if data.get(field) != entry.get(field):
-                    problems.append(f"{entry['name']}: {manifest} {field} differs from the catalog entry")
+                    problems.append(f"{entry['name']!r}: {manifest} {field} differs from the catalog entry")
 
 print("\n".join(problems) or f"catalogs ok ({len(claude_names)} plugins)")
 sys.exit(1 if problems else 0)
