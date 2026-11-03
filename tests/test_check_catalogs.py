@@ -42,7 +42,7 @@ class CheckCatalogsTest(unittest.TestCase):
         self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/evil/finolabs-vibecode.git"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
-        self.assertIn("source owner evil is not in OWNERS", result.stdout)
+        self.assertIn("source owner 'evil' is not in OWNERS", result.stdout)
 
     def test_remote_skips_a_source_that_already_failed(self):
         self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="evil/finolabs-vibecode"))
@@ -53,9 +53,21 @@ class CheckCatalogsTest(unittest.TestCase):
         result = subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), str(self.root), "--remote"],
                                 capture_output=True, text=True, env=env)
         self.assertEqual(result.returncode, 1)
-        self.assertIn("source owner evil is not in OWNERS", result.stdout)
+        self.assertIn("source owner 'evil' is not in OWNERS", result.stdout)
         self.assertNotIn("'finolabs-vibecode': cannot read", result.stdout)
         self.assertIn("'agybird': cannot read", result.stdout)
+
+    def test_remote_does_not_fetch_an_entry_past_the_shorter_catalog(self):
+        self.edit(self.claude, lambda d: d["plugins"][-1]["source"].update(repo="evil/x"))
+        self.edit(self.codex, lambda d: d["plugins"].pop())
+        empty = tempfile.TemporaryDirectory()
+        self.addCleanup(empty.cleanup)
+        env = {"CATALOG_RAW_BASE": Path(empty.name).as_uri(), "PATH": "/usr/bin:/bin"}
+        result = subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), str(self.root), "--remote"],
+                                capture_output=True, text=True, env=env)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("plugin lists differ", result.stdout)
+        self.assertNotIn("'markmap-skills': cannot read", result.stdout)
 
     def test_path_traversal_outside_owners_fails(self):
         self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="finolabs/../evil/x"))

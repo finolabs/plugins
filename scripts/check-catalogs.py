@@ -41,23 +41,26 @@ def repo_of_codex(entry):
 claude_names = [p["name"] for p in claude["plugins"]]
 codex_names = [p["name"] for p in codex["plugins"]]
 if claude["name"] != codex["name"]:
-    problems.append(f"catalog names differ: {claude['name']} and {codex['name']}")
+    problems.append(f"catalog names differ: {claude['name']!r} and {codex['name']!r}")
 if claude_names != codex_names:
     problems.append(f"plugin lists differ: {claude_names} and {codex_names}")
 if len(set(claude_names)) != len(claude_names):
     problems.append("a plugin is listed twice")
-bad_sources = set()
+def source_problem(repo):
+    """Why a catalog source may not be fetched, or None when it is a plain owner/repository in OWNERS."""
+    if not repo or not re.fullmatch(r"[A-Za-z0-9-]+/[A-Za-z0-9_.-]+", repo) or repo.split("/")[1] in (".", ".."):
+        return f"source {repo!r} is not a plain owner/repository"
+    if repo.split("/")[0] not in OWNERS:
+        return f"source owner {repo.split('/')[0]!r} is not in OWNERS"
+    return None
+
+
 for a, b in zip(claude["plugins"], codex["plugins"]):
     ra, rb = repo_of_claude(a), repo_of_codex(b)
     if not ra or ra != rb:
-        problems.append(f"{a['name']!r}: sources differ or are not GitHub repositories ({ra}, {rb})")
-        bad_sources.add(a["name"])
-    elif not re.fullmatch(r"[A-Za-z0-9-]+/[A-Za-z0-9_.-]+", ra) or ra.split("/")[1] in (".", ".."):
-        problems.append(f"{a['name']!r}: source {ra} is not a plain owner/repository")
-        bad_sources.add(a["name"])
-    elif ra.split("/")[0] not in OWNERS:
-        problems.append(f"{a['name']!r}: source owner {ra.split('/')[0]} is not in OWNERS")
-        bad_sources.add(a["name"])
+        problems.append(f"{a['name']!r}: sources differ or are not GitHub repositories ({ra!r}, {rb!r})")
+    elif source_problem(ra):
+        problems.append(f"{a['name']!r}: {source_problem(ra)}")
 
 for entry in claude["plugins"]:
     # Antigravity suggests 120-160 characters; one description serves every host and the README.
@@ -75,9 +78,9 @@ if readme.exists():
         problems.append(f"README table lists {[name for name, _, _ in rows]}, catalogs list {claude_names}")
     for (name, repo, description), entry in zip(rows, claude["plugins"]):
         if repo != repo_of_claude(entry):
-            problems.append(f"README table links {name} to {repo}, catalog to {repo_of_claude(entry)}")
+            problems.append(f"README table links {name!r} to {repo!r}, catalog to {repo_of_claude(entry)!r}")
         if description != entry.get("description"):
-            problems.append(f"{name}: README table description differs from the catalog entry")
+            problems.append(f"{name!r}: README table description differs from the catalog entry")
 
 if "--remote" in sys.argv:
     # CATALOG_RAW_BASE lets the tests read manifests from a directory laid out as <base>/<owner>/<repo>/HEAD/<path>.
@@ -85,9 +88,10 @@ if "--remote" in sys.argv:
     if not base.startswith(("https://", "file://")):
         sys.exit("CATALOG_RAW_BASE must start with https:// or file://")
     for entry in claude["plugins"]:
-        if entry["name"] in bad_sources:
-            continue
         repo = repo_of_claude(entry)
+        # Every Claude entry is guarded here, including ones past the shorter catalog that the zip above never saw.
+        if source_problem(repo):
+            continue
         for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json", ".antigravity-plugin/plugin.json"):
             url = f"{base}/{repo}/HEAD/{manifest}"
             try:
