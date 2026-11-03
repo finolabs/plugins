@@ -77,6 +77,70 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("README table lists", result.stdout)
 
+    def test_description_outside_length_range_fails(self):
+        self.edit(self.claude, lambda d: d["plugins"][0].update(description="Too short."))
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("description is 10 characters, expected 120-160", result.stdout)
+
+    def test_readme_description_out_of_step_fails(self):
+        self.edit(self.claude, lambda d: d["plugins"][1].update(description=d["plugins"][1]["description"] + " "))
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("README table description differs from the catalog entry", result.stdout)
+
+
+class RemoteManifestsTest(unittest.TestCase):
+    """--remote compares each plugin's three manifests with its catalog entry, read from a local tree."""
+
+    def setUp(self):
+        self.dir = tempfile.TemporaryDirectory()
+        self.base = Path(self.dir.name)
+        catalog = json.loads((ROOT / ".claude-plugin/marketplace.json").read_text())
+        for entry in catalog["plugins"]:
+            home = self.base / entry["source"]["repo"] / "HEAD"
+            for manifest in (".claude-plugin", ".codex-plugin", ".antigravity-plugin"):
+                (home / manifest).mkdir(parents=True)
+                (home / manifest / "plugin.json").write_text(json.dumps(
+                    {"name": entry["name"], "description": entry["description"], "keywords": entry["keywords"]}))
+        self.catalog = catalog
+
+    def tearDown(self):
+        self.dir.cleanup()
+
+    def check(self):
+        env = {"CATALOG_RAW_BASE": self.base.as_uri(), "PATH": "/usr/bin:/bin"}
+        return subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), "--remote"],
+                              capture_output=True, text=True, env=env)
+
+    def test_matching_manifests_pass(self):
+        result = self.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_manifest_description_drift_fails(self):
+        path = self.base / "finolabs/agybird/HEAD/.antigravity-plugin/plugin.json"
+        data = json.loads(path.read_text())
+        data["description"] = "A different description."
+        path.write_text(json.dumps(data))
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("agybird: .antigravity-plugin/plugin.json description differs from the catalog entry", result.stdout)
+
+    def test_manifest_keyword_drift_fails(self):
+        path = self.base / "finolabs/vietnamizer/HEAD/.codex-plugin/plugin.json"
+        data = json.loads(path.read_text())
+        data["keywords"] = data["keywords"][:-1]
+        path.write_text(json.dumps(data))
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("vietnamizer: .codex-plugin/plugin.json keywords differs from the catalog entry", result.stdout)
+
+    def test_missing_antigravity_manifest_fails(self):
+        (self.base / "finolabs/markmap-skills/HEAD/.antigravity-plugin/plugin.json").unlink()
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("markmap-skills: cannot read .antigravity-plugin/plugin.json", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

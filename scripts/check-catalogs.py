@@ -3,13 +3,15 @@
 
 Each plugin appears once in each catalog, in the same order, from the same
 GitHub repository. With --remote, also fetch each repository's plugin
-manifests and confirm their `name` matches the catalog entry. Every source
+manifests (Claude Code, Codex and Antigravity) and confirm their `name`,
+`description` and `keywords` match the catalog entry. Every source
 must belong to an owner in OWNERS, so a catalog edit cannot point a plugin at
 a look-alike fork. Pass a repository root as the first argument to check
 another copy of the catalogs (the tests do).
 """
 
 import json
+import os
 import re
 import sys
 import urllib.request
@@ -53,29 +55,44 @@ for a, b in zip(claude["plugins"], codex["plugins"]):
     elif ra.split("/")[0] not in OWNERS:
         problems.append(f"{a['name']}: source owner {ra.split('/')[0]} is not in OWNERS")
 
+for entry in claude["plugins"]:
+    # Antigravity suggests 120-160 characters; one description serves every host and the README.
+    description = entry.get("description", "")
+    if not 120 <= len(description) <= 160:
+        problems.append(f"{entry['name']}: description is {len(description)} characters, expected 120-160")
+    if not entry.get("keywords"):
+        problems.append(f"{entry['name']}: no keywords")
+
 readme = root / "README.md"
 if readme.exists():
     # The plugin table lists the catalog's plugins, in order, each linked to its repository.
-    rows = re.findall(r"^\| \[([^\]]+)\]\(https://github\.com/([^)]+)\) \|", readme.read_text(), re.M)
-    if [name for name, _ in rows] != claude_names:
-        problems.append(f"README table lists {[name for name, _ in rows]}, catalogs list {claude_names}")
-    for (name, repo), entry in zip(rows, claude["plugins"]):
+    rows = re.findall(r"^\| \[([^\]]+)\]\(https://github\.com/([^)]+)\) \| (.*) \|$", readme.read_text(), re.M)
+    if [name for name, _, _ in rows] != claude_names:
+        problems.append(f"README table lists {[name for name, _, _ in rows]}, catalogs list {claude_names}")
+    for (name, repo, description), entry in zip(rows, claude["plugins"]):
         if repo != repo_of_claude(entry):
             problems.append(f"README table links {name} to {repo}, catalog to {repo_of_claude(entry)}")
+        if description != entry.get("description"):
+            problems.append(f"{name}: README table description differs from the catalog entry")
 
 if "--remote" in sys.argv:
+    # CATALOG_RAW_BASE lets the tests read manifests from a directory laid out as <base>/<owner>/<repo>/HEAD/<path>.
+    base = os.environ.get("CATALOG_RAW_BASE", "https://raw.githubusercontent.com")
     for entry in claude["plugins"]:
         repo = repo_of_claude(entry)
-        for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json"):
-            url = f"https://raw.githubusercontent.com/{repo}/HEAD/{manifest}"
+        for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json", ".antigravity-plugin/plugin.json"):
+            url = f"{base}/{repo}/HEAD/{manifest}"
             try:
                 with urllib.request.urlopen(url, timeout=20) as response:
-                    name = json.load(response).get("name")
+                    data = json.load(response)
             except Exception as error:  # noqa: BLE001 - report any fetch or parse failure
                 problems.append(f"{entry['name']}: cannot read {manifest} ({error.__class__.__name__})")
                 continue
-            if name != entry["name"]:
-                problems.append(f"{entry['name']}: {manifest} names the plugin {name}")
+            if data.get("name") != entry["name"]:
+                problems.append(f"{entry['name']}: {manifest} names the plugin {data.get('name')}")
+            for field in ("description", "keywords"):
+                if data.get(field) != entry.get(field):
+                    problems.append(f"{entry['name']}: {manifest} {field} differs from the catalog entry")
 
 print("\n".join(problems) or f"catalogs ok ({len(claude_names)} plugins)")
 sys.exit(1 if problems else 0)
