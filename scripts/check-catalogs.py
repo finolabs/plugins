@@ -46,22 +46,26 @@ if claude_names != codex_names:
     problems.append(f"plugin lists differ: {claude_names} and {codex_names}")
 if len(set(claude_names)) != len(claude_names):
     problems.append("a plugin is listed twice")
+bad_sources = set()
 for a, b in zip(claude["plugins"], codex["plugins"]):
     ra, rb = repo_of_claude(a), repo_of_codex(b)
     if not ra or ra != rb:
-        problems.append(f"{a['name']}: sources differ or are not GitHub repositories ({ra}, {rb})")
+        problems.append(f"{a['name']!r}: sources differ or are not GitHub repositories ({ra}, {rb})")
+        bad_sources.add(a["name"])
     elif not re.fullmatch(r"[A-Za-z0-9-]+/[A-Za-z0-9_.-]+", ra) or ra.split("/")[1] in (".", ".."):
-        problems.append(f"{a['name']}: source {ra} is not a plain owner/repository")
+        problems.append(f"{a['name']!r}: source {ra} is not a plain owner/repository")
+        bad_sources.add(a["name"])
     elif ra.split("/")[0] not in OWNERS:
-        problems.append(f"{a['name']}: source owner {ra.split('/')[0]} is not in OWNERS")
+        problems.append(f"{a['name']!r}: source owner {ra.split('/')[0]} is not in OWNERS")
+        bad_sources.add(a["name"])
 
 for entry in claude["plugins"]:
     # Antigravity suggests 120-160 characters; one description serves every host and the README.
     description = entry.get("description", "")
     if not 120 <= len(description) <= 160:
-        problems.append(f"{entry['name']}: description is {len(description)} characters, expected 120-160")
+        problems.append(f"{entry['name']!r}: description is {len(description)} characters, expected 120-160")
     if not entry.get("keywords"):
-        problems.append(f"{entry['name']}: no keywords")
+        problems.append(f"{entry['name']!r}: no keywords")
 
 readme = root / "README.md"
 if readme.exists():
@@ -81,6 +85,8 @@ if "--remote" in sys.argv:
     if not base.startswith(("https://", "file://")):
         sys.exit("CATALOG_RAW_BASE must start with https:// or file://")
     for entry in claude["plugins"]:
+        if entry["name"] in bad_sources:
+            continue
         repo = repo_of_claude(entry)
         for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json", ".antigravity-plugin/plugin.json"):
             url = f"{base}/{repo}/HEAD/{manifest}"
@@ -88,16 +94,16 @@ if "--remote" in sys.argv:
                 with urllib.request.urlopen(url, timeout=20) as response:
                     data = json.load(response)
             except Exception as error:  # noqa: BLE001 - report any fetch or parse failure
-                problems.append(f"{entry['name']}: cannot read {manifest} ({error.__class__.__name__})")
+                problems.append(f"{entry['name']!r}: cannot read {manifest} ({error.__class__.__name__})")
                 continue
             if not isinstance(data, dict):
-                problems.append(f"{entry['name']}: {manifest} is not a JSON object")
+                problems.append(f"{entry['name']!r}: {manifest} is not a JSON object")
                 continue
             if data.get("name") != entry["name"]:
-                problems.append(f"{entry['name']}: {manifest} names the plugin {data.get('name')!r}")
+                problems.append(f"{entry['name']!r}: {manifest} names the plugin {data.get('name')!r}")
             for field in ("description", "keywords"):
                 if data.get(field) != entry.get(field):
-                    problems.append(f"{entry['name']}: {manifest} {field} differs from the catalog entry")
+                    problems.append(f"{entry['name']!r}: {manifest} {field} differs from the catalog entry")
 
 print("\n".join(problems) or f"catalogs ok ({len(claude_names)} plugins)")
 sys.exit(1 if problems else 0)
