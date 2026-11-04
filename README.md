@@ -1,10 +1,10 @@
 # FINOLABS plugins
 
-One catalog for the FINOLABS plugins, so each agent shows them together under **Finolabs**. Each plugin lives in its own repository under [github.com/finolabs](https://github.com/finolabs), with its own releases, issues and license; this repository only lists them. `finolabs/plugins` is the only official FINOLABS catalog. Installs track each plugin's default branch, which its repository protects with required pull requests and checks; to pin a release on Codex, add the plugin's own repository at its tag (`codex plugin marketplace add finolabs/<plugin>@v<version>`); Claude Code has no pinned marketplace install yet.
+One catalog for the FINOLABS plugins, so each agent shows them together under **Finolabs**. Each plugin lives in its own repository under [github.com/finolabs](https://github.com/finolabs), with its own releases, issues and license; this repository only lists them. `finolabs/plugins` is the only official FINOLABS catalog. Installs track each plugin's default branch, which its repository protects with required pull requests and checks, with one exception: the Claude Code catalog pins `finolabs-vibecode` to a release tag (`ref` in its `source`), moved to each new release by a pull request here, and checked on 2026-11-05 to install that tag's commit. To pin a release on Codex, add the plugin's own repository at its tag (`codex plugin marketplace add finolabs/<plugin>@v<version>`).
 
 | Plugin | What it does |
 | --- | --- |
-| [finolabs-vibecode](https://github.com/finolabs/finolabs-vibecode) | Engineering practice for AI coding agents: routing, delegation, review and security gates, verification, versioning and open source readiness. |
+| [finolabs-vibecode](https://github.com/finolabs/finolabs-vibecode) | Engineering practice for AI coding agents: routing, delegation, review and security gates, verification, versioning, agent scans and mode settings. |
 | [agybird](https://github.com/finolabs/agybird) | Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription. |
 | [vietnamizer](https://github.com/finolabs/vietnamizer) | Biên tập bản nháp, bài viết, README và bản dịch tiếng Việt cho tự nhiên hơn, giữ nguyên ý, dữ kiện, thuật ngữ, code và giọng người viết. |
 | [markmap-skills](https://github.com/finolabs/markmap-skills) | Markmap mindmaps for AI agents with strict cognitive structuring, delivered as clean .mindmap.md files and standalone HTML pages. |

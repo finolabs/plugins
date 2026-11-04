@@ -11,9 +11,10 @@
       "name": "finolabs-vibecode",
       "source": {
         "source": "github",
-        "repo": "finolabs/finolabs-vibecode"
+        "repo": "finolabs/finolabs-vibecode",
+        "ref": "v0.1.7"
       },
-      "description": "Engineering practice for AI coding agents: routing, delegation, review and security gates, verification, versioning and open source readiness.",
+      "description": "Engineering practice for AI coding agents: routing, delegation, review and security gates, verification, versioning, agent scans and mode settings.",
       "homepage": "https://github.com/finolabs/finolabs-vibecode",
       "repository": "https://github.com/finolabs/finolabs-vibecode",
       "license": "MIT",
