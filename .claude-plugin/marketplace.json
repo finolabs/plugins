@@ -14,7 +14,7 @@
         "repo": "finolabs/finolabs-vibecode",
         "ref": "v0.1.7"
       },
-      "description": "Engineering practice for AI coding agents: routing, delegation, review and security gates, verification, versioning and open source readiness.",
+      "description": "19 skills for AI coding agents: routing, delegation, second opinions and committees, session hygiene and shared knowledge, review gates, verification, versioning, local agent scans and mode settings.",
       "homepage": "https://github.com/finolabs/finolabs-vibecode",
       "repository": "https://github.com/finolabs/finolabs-vibecode",
       "license": "MIT",

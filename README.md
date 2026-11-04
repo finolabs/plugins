@@ -4,7 +4,7 @@ One catalog for the FINOLABS plugins, so each agent shows them together under **
 
 | Plugin | What it does |
 | --- | --- |
-| [finolabs-vibecode](https://github.com/finolabs/finolabs-vibecode) | Engineering practice for AI coding agents: routing, delegation, review and security gates, verification, versioning and open source readiness. |
+| [finolabs-vibecode](https://github.com/finolabs/finolabs-vibecode) | 19 skills for AI coding agents: routing, delegation, second opinions and committees, session hygiene and shared knowledge, review gates, verification, versioning, local agent scans and mode settings. |
 | [agybird](https://github.com/finolabs/agybird) | Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription. |
 | [vietnamizer](https://github.com/finolabs/vietnamizer) | Biên tập bản nháp, bài viết, README và bản dịch tiếng Việt cho tự nhiên hơn, giữ nguyên ý, dữ kiện, thuật ngữ, code và giọng người viết. |
 | [markmap-skills](https://github.com/finolabs/markmap-skills) | Markmap mindmaps for AI agents with strict cognitive structuring, delivered as clean .mindmap.md files and standalone HTML pages. |
