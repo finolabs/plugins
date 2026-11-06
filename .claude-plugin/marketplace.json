@@ -12,7 +12,7 @@
       "source": {
         "source": "github",
         "repo": "finolabs/finolabs-vibecode",
-        "ref": "v0.1.8"
+        "ref": "v0.1.9"
       },
       "description": "Engineering practice for AI coding agents: routing, delegation, review and security gates, verification, versioning, agent scans and mode settings.",
       "homepage": "https://github.com/finolabs/finolabs-vibecode",
