@@ -11,7 +11,7 @@ One catalog for the FINOLABS plugins, so each agent shows them together under **
 
 ## Listing standard
 
-Each plugin has one description of 120-160 characters and one keyword list. The catalog entry holds them, and the Claude Code, Codex and Antigravity manifests in the plugin's repository repeat them exactly. A plugin's description may be in the language of its audience. `scripts/check-catalogs.py --remote` fails when a manifest drifts from the catalog; change the catalog and the three manifests together.
+Each plugin has one description of 120-160 characters and one keyword list. The catalog entry holds them, and the Claude Code, Codex and Antigravity manifests in the plugin's repository repeat them exactly. A plugin's description may be in the language of its audience. `scripts/check-catalogs.py --remote` checks pinned tags are on the default branch and fails when a manifest at the pin (or HEAD without a pin) drifts from the catalog; change the catalog and the three manifests together.
 
 ## Install
 

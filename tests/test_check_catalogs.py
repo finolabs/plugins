@@ -142,14 +142,86 @@ class RemoteManifestsTest(unittest.TestCase):
                 (home / manifest / "plugin.json").write_text(json.dumps(
                     {"name": entry["name"], "description": entry["description"], "keywords": entry["keywords"]}))
         self.catalog = catalog
+        self.root = self.base / "catalog"
+        for name in (".claude-plugin", ".agents"):
+            shutil.copytree(ROOT / name, self.root / name)
+        shutil.copy(ROOT / "README.md", self.root / "README.md")
+        self.catalog_path = self.root / ".claude-plugin/marketplace.json"
+        for entry in catalog["plugins"]:
+            entry["source"].pop("ref", None)
+        self.catalog_path.write_text(json.dumps(catalog))
+
+    def pin(self, ref="v1", kind="commit", on_branch=True):
+        entry = self.catalog["plugins"][0]
+        entry["source"]["ref"] = ref
+        self.catalog_path.write_text(json.dumps(self.catalog))
+        repo = entry["source"]["repo"]
+        api = self.base / "api/repos" / repo
+        (api / "git/ref/tags").mkdir(parents=True, exist_ok=True)
+        (api / "git/ref/tags" / ref).write_text(json.dumps({"ref": "refs/tags/" + ref, "object": {"type": kind, "sha": "abc123"}}))
+        (api / "compare").mkdir(exist_ok=True)
+        (api / "compare/abc123...def456").write_text(json.dumps({"status": "ahead" if on_branch else "diverged"}))
+        (api / "commits").mkdir(exist_ok=True)
+        (api / "commits/main").write_text(json.dumps({"sha": "def456"}))
+        (api / "repository").write_text(json.dumps({"default_branch": "main"}))
+        shutil.copytree(self.base / repo / "HEAD", self.base / repo / "abc123", dirs_exist_ok=True)
 
     def tearDown(self):
         self.dir.cleanup()
 
     def check(self):
-        env = {"CATALOG_RAW_BASE": self.base.as_uri(), "PATH": "/usr/bin:/bin"}
-        return subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), "--remote"],
+        env = {"CATALOG_RAW_BASE": self.base.as_uri(), "CATALOG_API_BASE": (self.base / "api").as_uri(), "PATH": "/usr/bin:/bin"}
+        return subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), str(self.root), "--remote"],
                               capture_output=True, text=True, env=env)
+
+    def test_missing_tag_fails(self):
+        self.pin()
+        (self.base / "api/repos/finolabs/finolabs-vibecode/git/ref/tags/v1").unlink()
+        result = self.check()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("'v1'", result.stdout)
+
+    def test_branch_name_is_not_a_tag(self):
+        self.pin("main")
+        (self.base / "api/repos/finolabs/finolabs-vibecode/git/ref/tags/main").unlink()
+        result = self.check()
+        self.assertEqual(result.returncode, 1, result.stdout)
+
+    def test_commit_outside_default_branch_fails(self):
+        self.pin(on_branch=False)
+        result = self.check()
+        self.assertEqual(result.returncode, 1, result.stdout)
+
+    def test_drift_at_tag_fails_even_if_head_matches(self):
+        self.pin()
+        path = self.base / "finolabs/finolabs-vibecode/abc123/.codex-plugin/plugin.json"
+        data = json.loads(path.read_text())
+        data["description"] = "different"
+        path.write_text(json.dumps(data))
+        result = self.check()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("description differs from the catalog entry", result.stdout)
+
+    def test_annotated_tag_is_peeled(self):
+        self.pin(kind="tag")
+        api = self.base / "api/repos/finolabs/finolabs-vibecode/git/tags"
+        api.mkdir(parents=True)
+        (api / "abc123").write_text(json.dumps({"object": {"type": "commit", "sha": "abc123"}}))
+        result = self.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_valid_pin_passes(self):
+        self.pin()
+        result = self.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
+
+    def test_without_ref_reads_head(self):
+        self.pin()
+        self.catalog["plugins"][0]["source"].pop("ref")
+        self.catalog_path.write_text(json.dumps(self.catalog))
+        shutil.rmtree(self.base / "finolabs/finolabs-vibecode/abc123")
+        result = self.check()
+        self.assertEqual(result.returncode, 0, result.stdout)
 
     def test_matching_manifests_pass(self):
         result = self.check()

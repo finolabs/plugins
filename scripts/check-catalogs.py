@@ -14,6 +14,7 @@ import json
 import os
 import re
 import sys
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -87,13 +88,60 @@ if "--remote" in sys.argv:
     base = os.environ.get("CATALOG_RAW_BASE", "https://raw.githubusercontent.com")
     if not base.startswith(("https://", "file://")):
         sys.exit("CATALOG_RAW_BASE must start with https:// or file://")
+    api_base = os.environ.get("CATALOG_API_BASE", "https://api.github.com")
+    if not api_base.startswith(("https://", "file://")):
+        sys.exit("CATALOG_API_BASE must start with https:// or file://")
+
+    def fetch_json(url):
+        with urllib.request.urlopen(url, timeout=20) as response:
+            return json.load(response)
+
+    def pinned_commit(repo, ref):
+        if not isinstance(ref, str) or not ref or any(part in ("", ".", "..") for part in ref.split("/")):
+            raise ValueError("invalid ref")
+        api = f"{api_base}/repos/{repo}"
+        tag = fetch_json(f"{api}/git/ref/tags/{urllib.parse.quote(ref, safe='')}")
+        if tag["ref"] != f"refs/tags/{ref}":
+            raise ValueError("not an exact tag")
+        obj = tag["object"]
+        seen = set()
+        while obj["type"] == "tag":
+            sha = obj["sha"]
+            if not re.fullmatch(r"[0-9a-f]{6,40}", sha) or sha in seen:
+                raise ValueError("invalid tag object")
+            seen.add(sha)
+            obj = fetch_json(f"{api}/git/tags/{sha}")["object"]
+        sha = obj["sha"]
+        if obj["type"] != "commit" or not re.fullmatch(r"[0-9a-f]{6,40}", sha):
+            raise ValueError("invalid commit")
+        # A file fixture stores repository metadata inside its repository directory.
+        metadata_url = f"{api}/repository" if api_base.startswith("file://") else api
+        branch = fetch_json(metadata_url)["default_branch"]
+        if not isinstance(branch, str) or not branch:
+            raise ValueError("invalid default branch")
+        head = fetch_json(f"{api}/commits/{urllib.parse.quote(branch, safe='')}")["sha"]
+        if not re.fullmatch(r"[0-9a-f]{6,40}", head):
+            raise ValueError("invalid default branch head")
+        comparison = fetch_json(f"{api}/compare/{sha}...{head}")
+        if comparison["status"] not in ("ahead", "identical"):
+            raise ValueError("commit is not on default branch")
+        return sha
+
     for entry in claude["plugins"]:
         repo = repo_of_claude(entry)
         # Every Claude entry is guarded here, including ones past the shorter catalog that the zip above never saw.
         if source_problem(repo):
             continue
+        ref = entry["source"].get("ref")
+        revision = "HEAD"
+        if "ref" in entry["source"]:
+            try:
+                revision = pinned_commit(repo, ref)
+            except Exception:  # noqa: BLE001 - fail closed for invalid or inaccessible pins
+                problems.append(f"{entry['name']!r}: cannot verify tag {ref!r} on the default branch")
+                continue
         for manifest in (".claude-plugin/plugin.json", ".codex-plugin/plugin.json", ".antigravity-plugin/plugin.json"):
-            url = f"{base}/{repo}/HEAD/{manifest}"
+            url = f"{base}/{repo}/{revision}/{manifest}"
             try:
                 with urllib.request.urlopen(url, timeout=20) as response:
                     data = json.load(response)
