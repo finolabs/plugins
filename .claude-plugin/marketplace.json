@@ -54,7 +54,8 @@
       "name": "vietnamizer",
       "source": {
         "source": "github",
-        "repo": "finolabs/vietnamizer"
+        "repo": "finolabs/vietnamizer",
+        "ref": "v0.13.4"
       },
       "description": "Biên tập bản nháp, bài viết, README và bản dịch tiếng Việt cho tự nhiên hơn, giữ nguyên ý, dữ kiện, thuật ngữ, code và giọng người viết.",
       "homepage": "https://github.com/finolabs/vietnamizer",
