@@ -35,7 +35,7 @@
       "source": {
         "source": "github",
         "repo": "finolabs/agybird",
-        "ref": "v0.4.2"
+        "ref": "v0.4.3"
       },
       "description": "Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription.",
       "homepage": "https://github.com/finolabs/agybird",
