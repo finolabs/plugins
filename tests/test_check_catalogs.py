@@ -49,20 +49,24 @@ class CheckCatalogsTest(unittest.TestCase):
         self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/evil/finolabs-vibecode.git"))
         empty = tempfile.TemporaryDirectory()
         self.addCleanup(empty.cleanup)
-        env = {"CATALOG_RAW_BASE": Path(empty.name).as_uri(), "PATH": "/usr/bin:/bin"}
+        # Both bases point at an empty directory, so no request reaches GitHub: pinned entries fail at
+        # the tag check and unpinned ones at the manifest read, the same way on any network.
+        env = {"CATALOG_RAW_BASE": Path(empty.name).as_uri(), "CATALOG_API_BASE": Path(empty.name).as_uri(),
+               "PATH": "/usr/bin:/bin"}
         result = subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), str(self.root), "--remote"],
                                 capture_output=True, text=True, env=env)
         self.assertEqual(result.returncode, 1)
         self.assertIn("source owner 'evil' is not in OWNERS", result.stdout)
-        self.assertNotIn("'finolabs-vibecode': cannot read", result.stdout)
-        self.assertIn("'agybird': cannot read", result.stdout)
+        self.assertNotIn("'finolabs-vibecode': cannot", result.stdout)
+        self.assertIn("'agybird': cannot", result.stdout)
 
     def test_remote_does_not_fetch_an_entry_past_the_shorter_catalog(self):
         self.edit(self.claude, lambda d: d["plugins"][-1]["source"].update(repo="evil/x"))
         self.edit(self.codex, lambda d: d["plugins"].pop())
         empty = tempfile.TemporaryDirectory()
         self.addCleanup(empty.cleanup)
-        env = {"CATALOG_RAW_BASE": Path(empty.name).as_uri(), "PATH": "/usr/bin:/bin"}
+        env = {"CATALOG_RAW_BASE": Path(empty.name).as_uri(), "CATALOG_API_BASE": Path(empty.name).as_uri(),
+               "PATH": "/usr/bin:/bin"}
         result = subprocess.run([sys.executable, "-I", str(ROOT / "scripts/check-catalogs.py"), str(self.root), "--remote"],
                                 capture_output=True, text=True, env=env)
         self.assertEqual(result.returncode, 1)
