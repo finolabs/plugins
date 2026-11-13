@@ -77,7 +77,7 @@
         "source": "github",
         "repo": "finolabs/markmap-skills"
       },
-      "description": "Markmap mindmaps for AI agents with strict cognitive structuring, delivered as clean .mindmap.md files and standalone HTML pages.",
+      "description": "Turn notes and documents into editable Markdown and interactive Markmap mindmaps, for Claude Code, Codex and Antigravity. No background daemon.",
       "homepage": "https://github.com/finolabs/markmap-skills",
       "repository": "https://github.com/finolabs/markmap-skills",
       "license": "MIT",
