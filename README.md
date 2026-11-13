@@ -1,4 +1,48 @@
-# FINOLABS plugins
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/finolabs/.github/main/profile/assets/banner-dark.png">
+    <img src="https://raw.githubusercontent.com/finolabs/.github/main/profile/assets/banner-light.png" alt="FINOLABS. AI-native. Tech-driven. Open source plugins for AI coding agents." width="920">
+  </picture>
+</p>
+
+<h1 align="center">FINOLABS plugins</h1>
+
+<p align="center"><strong>One catalog for every FINOLABS plugin.</strong><br>
+Add <code>finolabs/plugins</code> once on Claude Code or Codex, then install any FINOLABS plugin by name. Antigravity installs each plugin from its repository.</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/finolabs/plugins" alt="License: MIT"></a>
+  <a href="https://github.com/finolabs/plugins/actions/workflows/validate.yml"><img src="https://github.com/finolabs/plugins/actions/workflows/validate.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="#claude-code"><img src="https://img.shields.io/badge/Claude%20Code-catalog-7FE2CE" alt="Claude Code catalog"></a>
+  <a href="#codex"><img src="https://img.shields.io/badge/Codex-catalog-7FE2CE" alt="Codex catalog"></a>
+  <a href="#antigravity"><img src="https://img.shields.io/badge/Antigravity-per%20repository-7FE2CE" alt="Antigravity: install per repository"></a>
+</p>
+
+## Install at a glance
+
+Run the commands for your host, then open a new chat. See [Install](#install) for updates, migration and other agents.
+
+**Claude Code** (in a terminal):
+
+```bash
+claude plugin marketplace add finolabs/plugins
+claude plugin install finolabs-vibecode@finolabs
+```
+
+**Codex** (in a terminal):
+
+```bash
+codex plugin marketplace add finolabs/plugins
+codex plugin add finolabs-vibecode@finolabs
+```
+
+**Antigravity** (in a terminal):
+
+```bash
+agy plugin install https://github.com/finolabs/finolabs-vibecode
+```
+
+## Plugins
 
 One catalog for the FINOLABS plugins, so each agent shows them together under **Finolabs**. Each plugin lives in its own repository under [github.com/finolabs](https://github.com/finolabs), with its own releases, issues and license; this repository only lists them. `finolabs/plugins` is the only official FINOLABS catalog. Installs track each plugin's default branch, which its repository protects with required pull requests and checks, with three exceptions: the Claude Code catalog pins `finolabs-vibecode`, `vietnamizer` and `agybird` to release tags (`ref` in their `source`), moved to each new release by a pull request here. The `finolabs-vibecode` pin was checked on 2026-11-05 and the `agybird` pin at v0.4.1 on 2026-11-11 to install that tag's commit; the `vietnamizer` pin has not yet been checked against an install. To pin a release on Codex, add the plugin's own repository at its tag (`codex plugin marketplace add finolabs/<plugin>@v<version>`).
 
@@ -8,6 +52,8 @@ One catalog for the FINOLABS plugins, so each agent shows them together under **
 | [agybird](https://github.com/finolabs/agybird) | Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription. |
 | [vietnamizer](https://github.com/finolabs/vietnamizer) | Biên tập bản nháp, bài viết, README và bản dịch tiếng Việt cho tự nhiên hơn, giữ nguyên ý, dữ kiện, thuật ngữ, code và giọng người viết. |
 | [markmap-skills](https://github.com/finolabs/markmap-skills) | Markmap mindmaps for AI agents with strict cognitive structuring, delivered as clean .mindmap.md files and standalone HTML pages. |
+
+[vibebiz](https://github.com/finolabs/vibebiz) sits outside this catalog: a Claude Cowork plugin, installed from its [latest release](https://github.com/finolabs/vibebiz/releases/latest). It is source-available (PolyForm Noncommercial 1.0.0, with a commercial license), not MIT.
 
 ## Listing standard
 
