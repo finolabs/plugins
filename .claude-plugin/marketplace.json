@@ -14,7 +14,7 @@
         "repo": "finolabs/finolabs-vibecode",
         "ref": "v0.2.5"
       },
-      "description": "25 skills and 3 agents (fnl-reviewer, fnl-security-reviewer, fnl-navigator) for routing, delegation, review gates, verification, setup, away mode and session health.",
+      "description": "25 skills and 3 agents (fnl-reviewer, fnl-security-reviewer, fnl-navigator) for routing, delegation, review gates, verification, setup and away mode.",
       "homepage": "https://github.com/finolabs/finolabs-vibecode",
       "repository": "https://github.com/finolabs/finolabs-vibecode",
       "license": "MIT",
