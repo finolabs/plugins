@@ -61,6 +61,7 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertIn("'agybird': cannot", result.stdout)
 
     def test_remote_does_not_fetch_an_entry_past_the_shorter_catalog(self):
+        last = json.loads(self.claude.read_text(encoding="utf-8"))["plugins"][-1]["name"]
         self.edit(self.claude, lambda d: d["plugins"][-1]["source"].update(repo="evil/x"))
         self.edit(self.codex, lambda d: d["plugins"].pop())
         empty = tempfile.TemporaryDirectory()
@@ -71,7 +72,7 @@ class CheckCatalogsTest(unittest.TestCase):
                                 capture_output=True, text=True, env=env)
         self.assertEqual(result.returncode, 1)
         self.assertIn("plugin lists differ", result.stdout)
-        self.assertNotIn("'markmap-skills': cannot read", result.stdout)
+        self.assertNotIn(f"'{last}': cannot", result.stdout)
 
     def test_path_traversal_outside_owners_fails(self):
         self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="finolabs/../evil/x"))
