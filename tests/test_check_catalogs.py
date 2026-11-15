@@ -181,14 +181,14 @@ class RemoteManifestsTest(unittest.TestCase):
 
     def test_missing_tag_fails(self):
         self.pin()
-        (self.base / "api/repos/finolabs/finolabs-vibecode/git/ref/tags/v1").unlink()
+        (self.base / "api/repos/finolabs/vibecode/git/ref/tags/v1").unlink()
         result = self.check()
         self.assertEqual(result.returncode, 1, result.stdout)
         self.assertIn("'v1'", result.stdout)
 
     def test_branch_name_is_not_a_tag(self):
         self.pin("main")
-        (self.base / "api/repos/finolabs/finolabs-vibecode/git/ref/tags/main").unlink()
+        (self.base / "api/repos/finolabs/vibecode/git/ref/tags/main").unlink()
         result = self.check()
         self.assertEqual(result.returncode, 1, result.stdout)
 
@@ -199,7 +199,7 @@ class RemoteManifestsTest(unittest.TestCase):
 
     def test_drift_at_tag_fails_even_if_head_matches(self):
         self.pin()
-        path = self.base / "finolabs/finolabs-vibecode/abc123/.codex-plugin/plugin.json"
+        path = self.base / "finolabs/vibecode/abc123/.codex-plugin/plugin.json"
         data = json.loads(path.read_text())
         data["description"] = "different"
         path.write_text(json.dumps(data))
@@ -209,7 +209,7 @@ class RemoteManifestsTest(unittest.TestCase):
 
     def test_annotated_tag_is_peeled(self):
         self.pin(kind="tag")
-        api = self.base / "api/repos/finolabs/finolabs-vibecode/git/tags"
+        api = self.base / "api/repos/finolabs/vibecode/git/tags"
         api.mkdir(parents=True)
         (api / "abc123").write_text(json.dumps({"object": {"type": "commit", "sha": "abc123"}}))
         result = self.check()
@@ -224,7 +224,7 @@ class RemoteManifestsTest(unittest.TestCase):
         self.pin()
         self.catalog["plugins"][0]["source"].pop("ref")
         self.catalog_path.write_text(json.dumps(self.catalog))
-        shutil.rmtree(self.base / "finolabs/finolabs-vibecode/abc123")
+        shutil.rmtree(self.base / "finolabs/vibecode/abc123")
         result = self.check()
         self.assertEqual(result.returncode, 0, result.stdout)
 

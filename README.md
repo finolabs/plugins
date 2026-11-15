@@ -39,7 +39,7 @@ codex plugin add finolabs-vibecode@finolabs
 **Antigravity** (in a terminal):
 
 ```bash
-agy plugin install https://github.com/finolabs/finolabs-vibecode
+agy plugin install https://github.com/finolabs/vibecode
 ```
 
 ## Plugins
@@ -48,7 +48,7 @@ One catalog for the FINOLABS plugins, so each agent shows them together under **
 
 | Plugin | What it does |
 | --- | --- |
-| [finolabs-vibecode](https://github.com/finolabs/finolabs-vibecode) | 25 skills and 3 agents (fnl-reviewer, fnl-security-reviewer, fnl-navigator) for review routing, verification, setup, run hygiene and quota on demand. |
+| [finolabs-vibecode](https://github.com/finolabs/vibecode) | 24 skills and 3 agents (fnl-reviewer, fnl-security-reviewer, fnl-navigator) for review routing, verification, setup, run hygiene and quota on demand. |
 | [agybird](https://github.com/finolabs/agybird) | Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription. |
 | [vietnamizer](https://github.com/finolabs/vietnamizer) | Viết và biên tập tiếng Việt tự nhiên hơn, giữ ý, dữ kiện, code và giọng người viết; hỏi “Vietnamizer làm được gì?” để xem tính năng và thiết lập giọng. |
 | [markmap-skills](https://github.com/finolabs/markmap-skills) | Turn notes and documents into editable Markdown and interactive Markmap mindmaps, for Claude Code, Codex and Antigravity. No background daemon. |
@@ -94,12 +94,12 @@ codex plugin add agybird@finolabs             # reinstall what you removed
 Antigravity 1.4 resolves `plugin@marketplace` only for its official marketplace (`antigravity-plugins-official`); `agy plugin install agybird@finolabs` answers "unknown marketplace". Install each plugin from its repository:
 
 ```bash
-agy plugin install https://github.com/finolabs/finolabs-vibecode
+agy plugin install https://github.com/finolabs/vibecode
 ```
 
 ### Other agents
 
-Plugins that ship agent skills also install through [skills.sh](https://skills.sh), for example `npx skills add finolabs/finolabs-vibecode`.
+Plugins that ship agent skills also install through [skills.sh](https://skills.sh), for example `npx skills add finolabs/vibecode`.
 
 ## For AI agents
 
