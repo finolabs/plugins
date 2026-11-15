@@ -72,7 +72,7 @@ class CheckCatalogsTest(unittest.TestCase):
                                 capture_output=True, text=True, env=env)
         self.assertEqual(result.returncode, 1)
         self.assertIn("plugin lists differ", result.stdout)
-        self.assertNotIn(f"'{last}': cannot read", result.stdout)
+        self.assertNotIn(f"'{last}': cannot", result.stdout)
 
     def test_path_traversal_outside_owners_fails(self):
         self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="finolabs/../evil/x"))
