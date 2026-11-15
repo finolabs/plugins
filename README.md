@@ -44,7 +44,7 @@ agy plugin install https://github.com/finolabs/finolabs-vibecode
 
 ## Plugins
 
-One catalog for the FINOLABS plugins, so each agent shows them together under **Finolabs**. Each plugin lives in its own repository under [github.com/finolabs](https://github.com/finolabs), with its own releases, issues and license; this repository only lists them. `finolabs/plugins` is the only official FINOLABS catalog. Installs track each plugin's default branch, which its repository protects with required pull requests and checks, with three exceptions: the Claude Code catalog pins `finolabs-vibecode`, `vietnamizer` and `agybird` to release tags (`ref` in their `source`), moved to each new release by a pull request here. The `finolabs-vibecode` pin was checked on 2026-11-05 and the `agybird` pin at v0.4.1 on 2026-11-11 to install that tag's commit; the `vietnamizer` pin has not yet been checked against an install. To pin a release on Codex, add the plugin's own repository at its tag (`codex plugin marketplace add finolabs/<plugin>@v<version>`).
+One catalog for the FINOLABS plugins, so each agent shows them together under **Finolabs**. Each plugin lives in its own repository under [github.com/finolabs](https://github.com/finolabs), with its own releases, issues and license; this repository only lists them. `finolabs/plugins` is the only official FINOLABS catalog. Installs track each plugin's default branch, which its repository protects with required pull requests and checks, with four exceptions: the Claude Code catalog pins `finolabs-vibecode`, `vietnamizer`, `agybird` and `vibebiz` to release tags (`ref` in their `source`), moved to each new release by a pull request here. The `finolabs-vibecode` pin was checked on 2026-11-05 and the `agybird` pin at v0.4.1 on 2026-11-11 to install that tag's commit; the `vietnamizer` and `vibebiz` pins have not yet been checked against an install. To pin a release on Codex, add the plugin's own repository at its tag (`codex plugin marketplace add finolabs/<plugin>@v<version>`).
 
 | Plugin | What it does |
 | --- | --- |
@@ -52,8 +52,9 @@ One catalog for the FINOLABS plugins, so each agent shows them together under **
 | [agybird](https://github.com/finolabs/agybird) | Delegate code work, image generation or editing, and general tasks to the official Google Antigravity CLI through an existing Gemini subscription. |
 | [vietnamizer](https://github.com/finolabs/vietnamizer) | Viết và biên tập tiếng Việt tự nhiên hơn, giữ ý, dữ kiện, code và giọng người viết; hỏi “Vietnamizer làm được gì?” để xem tính năng và thiết lập giọng. |
 | [markmap-skills](https://github.com/finolabs/markmap-skills) | Turn notes and documents into editable Markdown and interactive Markmap mindmaps, for Claude Code, Codex and Antigravity. No background daemon. |
+| [vibebiz](https://github.com/finolabs/vibebiz) | A product owner for founders and business leaders: turns a vague idea for a system, an AI use or an automation into a clear, challenged, measurable PRD. |
 
-[vibebiz](https://github.com/finolabs/vibebiz) sits outside this catalog: a Claude Cowork plugin, installed from its [latest release](https://github.com/finolabs/vibebiz/releases/latest). It is source-available (PolyForm Noncommercial 1.0.0, with a commercial license), not MIT.
+Each plugin carries its own license. [vibebiz](https://github.com/finolabs/vibebiz) is source-available, not open source: PolyForm Noncommercial 1.0.0, and a business needs its written commercial license. In Claude Cowork, install it from its [latest release](https://github.com/finolabs/vibebiz/releases/latest).
 
 ## Listing standard
 
@@ -111,7 +112,7 @@ When a user gives you this repository's link:
 
 ## Adding a plugin
 
-A plugin joins the catalog when its repository is public, has an OSI license, and ships a manifest for each host it supports (`.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, and `.antigravity-plugin/plugin.json` or a root `plugin.json`). Add it to both `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json` in the same position, add a row to the table above, and run:
+A plugin joins the catalog when its repository is public, has an OSI license or a source-available license stated under the table above, and ships a manifest for each host it supports (`.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, and `.antigravity-plugin/plugin.json` or a root `plugin.json`). Add it to both `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json` in the same position, add a row to the table above, and run:
 
 ```bash
 claude plugin validate .
