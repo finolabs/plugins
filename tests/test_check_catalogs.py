@@ -93,6 +93,18 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 1)
         self.assertIn("sources differ", result.stdout)
 
+    def test_codex_ref_must_match_the_claude_ref(self):
+        self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(ref="v0.0.1"))
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Codex ref", result.stdout)
+
+    def test_codex_ref_without_a_claude_ref_fails(self):
+        self.edit(self.claude, lambda d: d["plugins"][0]["source"].pop("ref"))
+        result = self.check()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Codex ref", result.stdout)
+
     def test_string_source_reports_instead_of_crashing(self):
         self.edit(self.codex, lambda d: d["plugins"][0].update(source="https://github.com/finolabs/agybird.git"))
         result = self.check()
@@ -155,6 +167,11 @@ class RemoteManifestsTest(unittest.TestCase):
         for entry in catalog["plugins"]:
             entry["source"].pop("ref", None)
         self.catalog_path.write_text(json.dumps(catalog))
+        codex_path = self.root / ".agents/plugins/marketplace.json"
+        codex = json.loads(codex_path.read_text())
+        for entry in codex["plugins"]:
+            entry["source"].pop("ref", None)
+        codex_path.write_text(json.dumps(codex))
 
     def pin(self, ref="v1", kind="commit", on_branch=True):
         entry = self.catalog["plugins"][0]

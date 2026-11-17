@@ -62,6 +62,11 @@ for a, b in zip(claude["plugins"], codex["plugins"]):
         problems.append(f"{a['name']!r}: sources differ or are not GitHub repositories ({ra!r}, {rb!r})")
     elif source_problem(ra):
         problems.append(f"{a['name']!r}: {source_problem(ra)}")
+    # A Codex pin repeats the Claude pin, so the remote check of the Claude tag covers both catalogs.
+    if isinstance(b.get("source"), dict) and "ref" in b["source"]:
+        claude_ref = a["source"].get("ref") if isinstance(a.get("source"), dict) else None
+        if b["source"]["ref"] != claude_ref:
+            problems.append(f"{a['name']!r}: Codex ref {b['source']['ref']!r} differs from the Claude ref {claude_ref!r}")
 
 for entry in claude["plugins"]:
     # Antigravity suggests 120-160 characters; one description serves every host and the README.
