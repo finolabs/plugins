@@ -8,7 +8,8 @@
       "name": "finolabs-vibecode",
       "source": {
         "source": "url",
-        "url": "https://github.com/finolabs/vibecode.git"
+        "url": "https://github.com/finolabs/vibecode.git",
+        "ref": "v0.3.2"
       },
       "policy": {
         "installation": "AVAILABLE",
