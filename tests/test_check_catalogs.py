@@ -11,6 +11,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 
+
+def by_name(catalog, name):
+    """The catalog entry named `name`, so fixtures do not depend on catalog order."""
+    return next(p for p in catalog["plugins"] if p["name"] == name)
+
 class CheckCatalogsTest(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.TemporaryDirectory()
@@ -38,15 +43,15 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout)
 
     def test_fork_outside_owners_fails(self):
-        self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="evil/finolabs-vibecode"))
-        self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/evil/finolabs-vibecode.git"))
+        self.edit(self.claude, lambda d: by_name(d, "finolabs-vibecode")["source"].update(repo="evil/finolabs-vibecode"))
+        self.edit(self.codex, lambda d: by_name(d, "finolabs-vibecode")["source"].update(url="https://github.com/evil/finolabs-vibecode.git"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("source owner 'evil' is not in OWNERS", result.stdout)
 
     def test_remote_skips_a_source_that_already_failed(self):
-        self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="evil/finolabs-vibecode"))
-        self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/evil/finolabs-vibecode.git"))
+        self.edit(self.claude, lambda d: by_name(d, "finolabs-vibecode")["source"].update(repo="evil/finolabs-vibecode"))
+        self.edit(self.codex, lambda d: by_name(d, "finolabs-vibecode")["source"].update(url="https://github.com/evil/finolabs-vibecode.git"))
         empty = tempfile.TemporaryDirectory()
         self.addCleanup(empty.cleanup)
         # Both bases point at an empty directory, so no request reaches GitHub: pinned entries fail at
@@ -75,8 +80,8 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertNotIn(f"'{last}': cannot", result.stdout)
 
     def test_path_traversal_outside_owners_fails(self):
-        self.edit(self.claude, lambda d: d["plugins"][0]["source"].update(repo="finolabs/../evil/x"))
-        self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(url="https://github.com/finolabs/../evil/x.git"))
+        self.edit(self.claude, lambda d: by_name(d, "finolabs-vibecode")["source"].update(repo="finolabs/../evil/x"))
+        self.edit(self.codex, lambda d: by_name(d, "finolabs-vibecode")["source"].update(url="https://github.com/finolabs/../evil/x.git"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("is not a plain owner/repository", result.stdout)
@@ -88,25 +93,25 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertIn("plugin lists differ", result.stdout)
 
     def test_sources_that_differ_fail(self):
-        self.edit(self.codex, lambda d: d["plugins"][1]["source"].update(url="https://github.com/finolabs/other.git"))
+        self.edit(self.codex, lambda d: by_name(d, "agybird")["source"].update(url="https://github.com/finolabs/other.git"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("sources differ", result.stdout)
 
     def test_codex_ref_must_match_the_claude_ref(self):
-        self.edit(self.codex, lambda d: d["plugins"][0]["source"].update(ref="v0.0.1"))
+        self.edit(self.codex, lambda d: by_name(d, "finolabs-vibecode")["source"].update(ref="v0.0.1"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("Codex ref", result.stdout)
 
     def test_codex_ref_without_a_claude_ref_fails(self):
-        self.edit(self.claude, lambda d: d["plugins"][0]["source"].pop("ref"))
+        self.edit(self.claude, lambda d: by_name(d, "finolabs-vibecode")["source"].pop("ref"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("Codex ref", result.stdout)
 
     def test_string_source_reports_instead_of_crashing(self):
-        self.edit(self.codex, lambda d: d["plugins"][0].update(source="https://github.com/finolabs/agybird.git"))
+        self.edit(self.codex, lambda d: by_name(d, "finolabs-vibecode").update(source="https://github.com/finolabs/agybird.git"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("sources differ", result.stdout)
@@ -120,7 +125,7 @@ class CheckCatalogsTest(unittest.TestCase):
         self.assertIn("README table lists", result.stdout)
 
     def test_description_outside_length_range_fails(self):
-        self.edit(self.claude, lambda d: d["plugins"][0].update(description="Too short."))
+        self.edit(self.claude, lambda d: by_name(d, "finolabs-vibecode").update(description="Too short."))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("description is 10 characters, expected 120-160", result.stdout)
@@ -128,18 +133,18 @@ class CheckCatalogsTest(unittest.TestCase):
     def test_description_length_limits_are_inclusive(self):
         for length, accepted in [(119, False), (120, True), (160, True), (161, False)]:
             with self.subTest(length=length):
-                self.edit(self.claude, lambda d: d["plugins"][0].update(description="x" * length))
+                self.edit(self.claude, lambda d: by_name(d, "finolabs-vibecode").update(description="x" * length))
                 stdout = self.check().stdout
                 self.assertEqual("expected 120-160" not in stdout, accepted, stdout)
 
     def test_entry_without_keywords_fails(self):
-        self.edit(self.claude, lambda d: d["plugins"][0].pop("keywords"))
+        self.edit(self.claude, lambda d: by_name(d, "finolabs-vibecode").pop("keywords"))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("'finolabs-vibecode': no keywords", result.stdout)
 
     def test_readme_description_out_of_step_fails(self):
-        self.edit(self.claude, lambda d: d["plugins"][1].update(description=d["plugins"][1]["description"] + " "))
+        self.edit(self.claude, lambda d: by_name(d, "agybird").update(description=by_name(d, "agybird")["description"] + " "))
         result = self.check()
         self.assertEqual(result.returncode, 1)
         self.assertIn("README table description differs from the catalog entry", result.stdout)
@@ -174,7 +179,7 @@ class RemoteManifestsTest(unittest.TestCase):
         codex_path.write_text(json.dumps(codex))
 
     def pin(self, ref="v1", kind="commit", on_branch=True):
-        entry = self.catalog["plugins"][0]
+        entry = by_name(self.catalog, "finolabs-vibecode")
         entry["source"]["ref"] = ref
         self.catalog_path.write_text(json.dumps(self.catalog))
         repo = entry["source"]["repo"]
@@ -239,7 +244,7 @@ class RemoteManifestsTest(unittest.TestCase):
 
     def test_without_ref_reads_head(self):
         self.pin()
-        self.catalog["plugins"][0]["source"].pop("ref")
+        by_name(self.catalog, "finolabs-vibecode")["source"].pop("ref")
         self.catalog_path.write_text(json.dumps(self.catalog))
         shutil.rmtree(self.base / "finolabs/vibecode/abc123")
         result = self.check()

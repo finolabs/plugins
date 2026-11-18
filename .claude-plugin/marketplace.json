@@ -8,6 +8,26 @@
   "description": "FINOLABS plugins for AI coding agents.",
   "plugins": [
     {
+      "name": "vibebiz",
+      "source": {
+        "source": "github",
+        "repo": "finolabs/vibebiz",
+        "ref": "v0.1.8"
+      },
+      "description": "A product owner for founders and business leaders: turns a vague idea for a system, an AI use or an automation into a clear, challenged, measurable PRD.",
+      "homepage": "https://github.com/finolabs/vibebiz",
+      "repository": "https://github.com/finolabs/vibebiz",
+      "license": "PolyForm-Noncommercial-1.0.0",
+      "category": "productivity",
+      "keywords": [
+        "retail",
+        "product-owner",
+        "prd",
+        "interview",
+        "cowork"
+      ]
+    },
+    {
       "name": "finolabs-vibecode",
       "source": {
         "source": "github",
@@ -88,26 +108,6 @@
         "visualization",
         "diagram",
         "agent-skills"
-      ]
-    },
-    {
-      "name": "vibebiz",
-      "source": {
-        "source": "github",
-        "repo": "finolabs/vibebiz",
-        "ref": "v0.1.8"
-      },
-      "description": "A product owner for founders and business leaders: turns a vague idea for a system, an AI use or an automation into a clear, challenged, measurable PRD.",
-      "homepage": "https://github.com/finolabs/vibebiz",
-      "repository": "https://github.com/finolabs/vibebiz",
-      "license": "PolyForm-Noncommercial-1.0.0",
-      "category": "productivity",
-      "keywords": [
-        "retail",
-        "product-owner",
-        "prd",
-        "interview",
-        "cowork"
       ]
     }
   ]
