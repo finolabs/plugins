@@ -32,9 +32,9 @@
       "source": {
         "source": "github",
         "repo": "finolabs/vibecode",
-        "ref": "v0.3.2"
+        "ref": "v0.3.3"
       },
-      "description": "24 skills and 3 agents (reviewer, security-reviewer, navigator) for review routing, verification, setup, run hygiene and quota on demand.",
+      "description": "25 skills and 3 agents (reviewer, security-reviewer, navigator) for review routing, verification, setup, run hygiene and quota on demand.",
       "homepage": "https://github.com/finolabs/vibecode",
       "repository": "https://github.com/finolabs/vibecode",
       "license": "MIT",
