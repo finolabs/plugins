@@ -76,7 +76,7 @@
       "source": {
         "source": "github",
         "repo": "finolabs/vietnamizer",
-        "ref": "v0.16.2"
+        "ref": "v0.16.3"
       },
       "description": "Viết và biên tập tiếng Việt tự nhiên hơn, giữ ý, dữ kiện, code và giọng người viết; hỏi “Vietnamizer làm được gì?” để xem tính năng và thiết lập giọng.",
       "homepage": "https://github.com/finolabs/vietnamizer",
