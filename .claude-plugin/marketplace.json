@@ -12,7 +12,7 @@
       "source": {
         "source": "github",
         "repo": "finolabs/vibebiz",
-        "ref": "v0.1.8"
+        "ref": "v0.1.9"
       },
       "description": "A product owner for founders and business leaders: turns a vague idea for a system, an AI use or an automation into a clear, challenged, measurable PRD.",
       "homepage": "https://github.com/finolabs/vibebiz",
